@@ -55,10 +55,5 @@ class SearchApi extends CI_Controller {
 		// print_r($data);
 		echo json_encode($data);
 	}
-	public function b()
-	{
-		$data = $this->SearchDatabase->b();
-		echo $data;
-	}
 
 }

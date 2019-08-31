@@ -39,10 +39,23 @@ class SearchDatabase extends CI_Model {
         $productName = $this->input->post('productName');
         $productHub = $this->db->query("select hub_id from product where product_name = '$productName'")->result_array();
         $sessionShop = $this->session->userdata('nearid');
-        // $this->db->where_in('id',$sessionShop);
-        //     $this->db->where_in('id',$productHub);
-        //         $availableShops = $this->db->get('distributor_hub')->result_array();
-        return $productHub;
+        $hubCount = count($productHub);
+
+        for($i = 0;$i < $hubCount; $i++)
+        {
+            $hubIdArray[$i] = json_decode($productHub[$i]['hub_id']);
+        }
+        $this->db->where_in('id',$sessionShop);
+            $this->db->where_in('id',$hubIdArray);
+                $availableShops = $this->db->get('distributor_hub')->result_array();
+        if($availableShops!=0)
+        {
+            return $availableShops;
+        }
+        else
+        {
+            return "product is not available near you";
+        }
     }
    
 
@@ -104,16 +117,18 @@ class SearchDatabase extends CI_Model {
         return $pickupAddress;
         
     }
-
-    public function b($data = '')
-    {
-        return var_dump($data);
-    }
     
     public function c()
     {
-        $data = 1;
-        b("hello");
+        $productHub = $this->db->query("select hub_id from product where product_name = 'mobile'")->result_array();
+        $hubCount = count($productHub);
+
+        for($i = 0;$i < $hubCount; $i++)
+        {
+            $a[$i] = json_decode($productHub[$i]['hub_id']);
+        }
+        // return var_dump($a);
+        return $a;
         // $hubId = 1;
         // $shop = $this->db->query("select * from distributor_hub where id = '$hubId'")->result_array();
         // $coordinates = json_decode($shop[0]['location_coordinate'],true);

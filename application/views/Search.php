@@ -183,7 +183,7 @@
 				let response = await request.json();
 				console.log(response);
 			}
-			console.log(jsonData);
+			// console.log(jsonData);
 			for(var i in item)
             {
                 modalBody = document.getElementById('modalBody');
