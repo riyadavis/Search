@@ -17,20 +17,29 @@ class SearchDatabase extends CI_Model {
         $totalProduct = $this->db->query("select count(*) as count from product")->result_array();
         $totalProductCount = $totalProduct[0]['count'];
 
+        $searchProductTag = $this->db->query("select count(*) as count from product where MATCH (product_tags) AGAINST ('".$searchItem."')")->result_array();
+        $ProductTagcount = $searchProductTag[0]['count'];
+        
         $shopProbability = $shopSearchCount/$totalShopCount;
         $productProbability = $productSearchCount/$totalProductCount;
+        $tagProbability = $ProductTagcount/$totalProductCount;
 
-        $highestProbability = max($shopProbability,$productProbability);
+        $highestProbability = max($shopProbability,$productProbability,$tagProbability);
 
         if($highestProbability == $shopProbability)
         {
             $shopLists = $this->db->query("select id,hub_name,pickup_address,image from distributor_hub where hub_name like '%$searchItem%'")->result_array();
             return $shopLists;
         }
-       else
+       else if($highestProbability == $productProbability)
        {
             $productLists = $this->db->query("select id,hub_id,product_name,product_image,product_price from product where product_name like '%$searchItem%'")->result_array();
             return $productLists;
+       }
+       else 
+       {
+           $tagLists = $this->db->query("select id,hub_id,product_name,product_image,product_price,product_tags from product where MATCH(product_tags) AGAINST('$searchItem')")->result_array();
+           return $tagLists;
        }
     }
 
@@ -120,15 +129,19 @@ class SearchDatabase extends CI_Model {
     
     public function c()
     {
-        $productHub = $this->db->query("select hub_id from product where product_name = 'mobile'")->result_array();
-        $hubCount = count($productHub);
+        $searchProduct = $this->db->query("select count(*) as count from product where product_name like '%$searchItem%' or product_tags like '%$searchItem%'")->result_array();
+        $productSearchCount = $searchProduct[0]['count'];
+        $totalProduct = $this->db->query("select count(*) as count from product")->result_array();
+        $totalProductCount = $totalProduct[0]['count'];
+        // $productHub = $this->db->query("select hub_id from product where product_name = 'mobile'")->result_array();
+        // $hubCount = count($productHub);
 
-        for($i = 0;$i < $hubCount; $i++)
-        {
-            $a[$i] = json_decode($productHub[$i]['hub_id']);
-        }
-        // return var_dump($a);
-        return $a;
+        // for($i = 0;$i < $hubCount; $i++)
+        // {
+        //     $a[$i] = json_decode($productHub[$i]['hub_id']);
+        // }
+        // // return var_dump($a);
+        // return $a;
         // $hubId = 1;
         // $shop = $this->db->query("select * from distributor_hub where id = '$hubId'")->result_array();
         // $coordinates = json_decode($shop[0]['location_coordinate'],true);

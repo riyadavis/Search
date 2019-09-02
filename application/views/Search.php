@@ -78,12 +78,18 @@
 				option.value = r.hub_name;
 				option.id = r.id;
 			}
+			else if(response[0]['product_tags'])
+			{
+				option.value = r.product_tags;
+				option.id = r.id;
+			}
 			else
 			{
 				option.value = r.product_name;
 				option.id = r.id;
 			}
 			datalist.appendChild(option);
+			// console.log(option);
 		});
 
 		getLocation();
@@ -131,6 +137,8 @@
 	{
 		// document.getElementById('badModal').innerHTML = "";
 		var hub = response.filter(r => r.hub_name == search.value);
+		var tags = response.filter(r => r.product_tags == search.value);
+		
 		if(hub.length != 0)
 		{
 			
@@ -153,36 +161,19 @@
             $('#badModal').modal('show');
 			
 		}
-		else
+		else if(tags.length != 0)
+		{
+			var item = tags[0];
+			var jsonData = JSON.stringify(item);
+			shopDetails(item);
+		}
+		else 
 		{
 			var product = response.filter(r =>r.product_name == search.value);
 			var item = product[0];
 			var jsonData = JSON.stringify(item);
-			shopDetails();
-			async function shopDetails()
-			{
-				let url = "<?php echo site_url('SearchApi/shopDetails'); ?>";
-				// let hubId = document.createElement('input');
-				// hubId.value = item['hub_id'];
-				// hubId.id = "hubId";
-				// hubId.name = "hubId";
-				// hubId.type = "hidden";
-				let productName = document.createElement('input');
-					productName.value = item['product_name'];
-					productName.name = "productName";
-					productName.id = "productName";
-					productName.type = "hidden";
-				let form = new FormData();
-				// form.append('hubId',hubId.value);
-				form.append('productName',productName.value);
-				// console.log(hubId);
-				let request = await fetch(url,{
-					method : "post",
-					body : form
-				});
-				let response = await request.json();
-				console.log(response);
-			}
+			shopDetails(item);
+			
 			// console.log(jsonData);
 			for(var i in item)
             {
@@ -199,7 +190,32 @@
             
             $('#badModal').modal('show');		
 		}
+		
 	}
+	async function shopDetails(item)
+		{
+			let url = "<?php echo site_url('SearchApi/shopDetails'); ?>";
+			// let hubId = document.createElement('input');
+			// hubId.value = item['hub_id'];
+			// hubId.id = "hubId";
+			// hubId.name = "hubId";
+			// hubId.type = "hidden";
+			let productName = document.createElement('input');
+				productName.value = item['product_name'];
+				productName.name = "productName";
+				productName.id = "productName";
+				productName.type = "hidden";
+			let form = new FormData();
+			// form.append('hubId',hubId.value);
+			form.append('productName',productName.value);
+			// console.log(hubId);
+			let request = await fetch(url,{
+				method : "post",
+				body : form
+			});
+			let response = await request.json();
+			console.log(response);
+		}
 </script>
 <script src="<?php echo base_url().'assets/js/bootstrap.min.js';?>"></script>
 </html>
