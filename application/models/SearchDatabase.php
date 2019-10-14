@@ -3,6 +3,27 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class SearchDatabase extends CI_Model {
 
+    public function SaltData()
+    {
+        $salt = 'adastratechnologies';
+        $hash = sha1($salt.'adastra');
+        $this->session->set_userdata('userauth',$hash);
+        if(isset($_GET['q']))
+        {
+            $mobno = $_GET['q'];
+            $pw_hash = sha1($salt.$mobno);
+            $matchData = $this->db->query("select * from api_table where MATCH(salt) AGAINST('$pw_hash' IN NATURAL LANGUAGE MODE)")->result_array(); 
+            if($this->db->affected_rows()>0)
+            {
+                $this->session->set_userdata('userauth',$pw_hash);
+                return 0;
+            }
+        }
+        return 0;
+        // return $pw_hash;
+        // return $iduser;
+    }
+
     public function searchResult()
     {
         $searchItem = $_GET['q'];
@@ -43,11 +64,13 @@ class SearchDatabase extends CI_Model {
        }
     }
 
-    public function shopDetails()
+    public function shopDetails($nearShop = null)
     {
         $productName = $this->input->post('productName');
         $productHub = $this->db->query("select hub_id from product where product_name = '$productName'")->result_array();
-        $sessionShop = $this->session->userdata('nearid');
+        // $sessionShop = $this->session->userdata('nearid');
+        // return $nearShop;
+        $sessionShop = $nearShop;
         $hubCount = count($productHub);
 
         for($i = 0;$i < $hubCount; $i++)
@@ -103,10 +126,10 @@ class SearchDatabase extends CI_Model {
             }
             $this->db->where_in('id',$nearId);
                $nearShop =  $this->db->get('distributor_hub')->result_array();
-                $this->session->set_userdata('nearid',$nearId);  
-            // $this->shopDetails($nearShop);
-            return $nearShop;
-        // return $lat;
+                // $this->session->set_userdata('nearid',$nearId);  
+            $returnData = $this->shopDetails($nearShop);
+            // return $nearShop;
+       
     }
 
     

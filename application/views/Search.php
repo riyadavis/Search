@@ -125,8 +125,6 @@
 						method : "post",
 						body : form 
 					});
-					let response = await request.json();
-					console.log(response);
 				}
 			
 			}
